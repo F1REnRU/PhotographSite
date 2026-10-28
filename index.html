@@ -23,7 +23,7 @@
       margin: 0; 
       padding: 0; 
       box-sizing: border-box; 
-      -webkit-tap-highlight-color: transparent; /* Убирает синюю рамку при тапе на телефонах */
+      -webkit-tap-highlight-color: transparent;
     }
 
     body {
@@ -33,7 +33,6 @@
       font-weight: 300;
       line-height: 1.6;
       -webkit-font-smoothing: antialiased;
-      /* Предотвращает горизонтальную прокрутку */
       overflow-x: hidden; 
     }
 
@@ -45,7 +44,7 @@
     /* Приветствие */
     .hero { 
       text-align: center; 
-      padding: 80px 16px 50px; /* Уменьшили отступы для мобильных */
+      padding: 80px 16px 50px; 
     }
 
     .hero h1 {
@@ -94,10 +93,57 @@
       transition: transform 0.5s ease;
     }
 
-    /* Эффект наведения только для устройств с мышью */
     @media (hover: hover) {
       .gallery-item:hover img { transform: scale(1.04); }
     }
+
+    /* ===== ЛАЙТБОКС (Всплывающее окно) ===== */
+    .lightbox {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(14, 14, 14, 0.95);
+      z-index: 1000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      backdrop-filter: blur(8px);
+    }
+
+    .lightbox.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .lightbox-img {
+      max-width: 90vw;
+      max-height: 90vh;
+      object-fit: contain;
+      border-radius: 4px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      transform: scale(0.95);
+      transition: transform 0.3s ease;
+    }
+
+    .lightbox.active .lightbox-img {
+      transform: scale(1);
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      color: #fff;
+      font-size: 40px;
+      line-height: 1;
+      cursor: pointer;
+      opacity: 0.6;
+      transition: opacity 0.2s;
+    }
+    
+    .lightbox-close:hover { opacity: 1; }
 
     /* Контакты */
     .contact {
@@ -126,7 +172,6 @@
       border: 1px solid rgba(255,255,255,0.15);
       font-size: 0.9rem;
       transition: all 0.3s;
-      /* Для удобного нажатия пальцем */
       display: inline-block;
     }
     .contact-link:hover { border-color: var(--accent); color: var(--accent); }
@@ -139,28 +184,17 @@
     }
 
     /* ===== АДАПТИВ ===== */
-    
-    /* Планшеты */
     @media (max-width: 900px) {
       .gallery-grid { column-count: 2; }
     }
 
-    /* Телефоны */
     @media (max-width: 560px) {
-      :root { 
-        --pad: 4px; 
-        --gap: 4px; 
-      }
-      
+      :root { --pad: 4px; --gap: 4px; }
       .hero { padding: 60px 16px 40px; }
       .hero h1 { font-size: clamp(1.6rem, 6vw, 2.2rem); }
       .hero p { font-size: 0.95rem; }
-      
-      .gallery-grid { column-count: 2; } /* Оставляем 2 колонки на телефоне */
-      
+      .gallery-grid { column-count: 2; }
       .contact { padding: 40px 16px 60px; }
-      
-      /* Кнопки контактов на всю ширину для удобства нажатия */
       .contact-links {
         flex-direction: column;
         align-items: stretch;
@@ -204,13 +238,19 @@
     </div>
   </section>
 
+  <!-- Лайтбокс (всплывающее окно) -->
+  <div class="lightbox" id="lightbox">
+    <span class="lightbox-close" id="lightboxClose">&times;</span>
+    <img src="" alt="Просмотр" class="lightbox-img" id="lightboxImg">
+  </div>
+
   <!-- Контакты -->
   <section class="contact">
     <div class="container">
       <h2>Связаться со мной</h2>
       <p>Напишите, чтобы обсудить съёмку.</p>
       <div class="contact-links">
-        <a href="mailto:hello@example.com" class="contact-link">trukhonindanil@gmail.com</a>
+        <a href="mailto:trukhonindanil@gmail.com" class="contact-link">trukhonindanil@gmail.com</a>
         <a href="https://t.me/F1RE_RU" target="_blank" rel="noopener" class="contact-link">Telegram</a>
         <a href="https://vk.ru/f1re_ru" target="_blank" rel="noopener" class="contact-link">Вконтакте</a>
       </div>
@@ -224,6 +264,7 @@
   <script>
     document.getElementById('year').textContent = new Date().getFullYear();
 
+    // Перемешивание массива (Фишер-Йетс)
     function shuffleArray(array) {
       for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -233,12 +274,47 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+      // 1. Перемешиваем галерею
       const grid = document.getElementById('galleryGrid');
       const items = Array.from(grid.children);
       const shuffledItems = shuffleArray(items);
       
       grid.innerHTML = '';
       shuffledItems.forEach(item => grid.appendChild(item));
+
+      // 2. Логика лайтбокса
+      const lightbox = document.getElementById('lightbox');
+      const lightboxImg = document.getElementById('lightboxImg');
+      const lightboxClose = document.getElementById('lightboxClose');
+      const galleryImages = document.querySelectorAll('.gallery-item img');
+
+      galleryImages.forEach(img => {
+        img.addEventListener('click', (e) => {
+          lightboxImg.src = e.target.src;
+          lightbox.classList.add('active');
+          document.body.style.overflow = 'hidden';
+        });
+      });
+
+      function closeLightbox() {
+        lightbox.classList.remove('active');
+        document.body.style.overflow = '';
+        setTimeout(() => { lightboxImg.src = ''; }, 300);
+      }
+
+      lightboxClose.addEventListener('click', closeLightbox);
+
+      lightbox.addEventListener('click', (e) => {
+        if (e.target === lightbox) {
+          closeLightbox();
+        }
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && lightbox.classList.contains('active')) {
+          closeLightbox();
+        }
+      });
     });
   </script>
 
