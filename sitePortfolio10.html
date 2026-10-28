@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Имя Фамилия — Фотограф</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #0e0e0e;
+      --text: #f2f2f2;
+      --muted: #9a9a9a;
+      --accent: #d4af7a;
+      --gap: 6px;
+      --pad: 6px;
+    }
+
+    * { 
+      margin: 0; 
+      padding: 0; 
+      box-sizing: border-box; 
+      -webkit-tap-highlight-color: transparent; /* Убирает синюю рамку при тапе на телефонах */
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', system-ui, sans-serif;
+      font-weight: 300;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      /* Предотвращает горизонтальную прокрутку */
+      overflow-x: hidden; 
+    }
+
+    img { display: block; width: 100%; height: auto; }
+    a { color: inherit; text-decoration: none; }
+
+    .container { width: 100%; padding: 0 var(--pad); }
+
+    /* Приветствие */
+    .hero { 
+      text-align: center; 
+      padding: 80px 16px 50px; /* Уменьшили отступы для мобильных */
+    }
+
+    .hero h1 {
+      font-size: clamp(1.8rem, 5vw, 4rem);
+      font-weight: 500;
+      line-height: 1.1;
+      margin-bottom: 16px;
+    }
+    .hero h1 span { color: var(--accent); }
+
+    .hero p {
+      color: var(--muted);
+      max-width: 520px;
+      margin: 0 auto;
+      font-size: 1rem;
+    }
+
+    /* ===== ГАЛЕРЕЯ (Pinterest стиль) ===== */
+    .gallery { padding: 10px 0 60px; }
+
+    .gallery-grid {
+      column-count: 3;
+      column-gap: var(--gap);
+    }
+
+    .gallery-item {
+      break-inside: avoid;
+      margin-bottom: var(--gap);
+      border-radius: 4px;
+      overflow: hidden;
+      background: #161616;
+      cursor: pointer;
+      position: relative;
+      animation: fadeIn 0.6s ease forwards;
+      opacity: 0;
+    }
+
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+
+    .gallery-item img {
+      width: 100%;
+      height: auto;
+      display: block;
+      transition: transform 0.5s ease;
+    }
+
+    /* Эффект наведения только для устройств с мышью */
+    @media (hover: hover) {
+      .gallery-item:hover img { transform: scale(1.04); }
+    }
+
+    /* Контакты */
+    .contact {
+      text-align: center;
+      padding: 60px 16px 80px;
+      border-top: 1px solid rgba(255,255,255,0.07);
+    }
+
+    .contact h2 {
+      font-size: clamp(1.4rem, 4vw, 2.4rem);
+      font-weight: 500;
+      margin-bottom: 12px;
+    }
+    .contact p { color: var(--muted); margin-bottom: 24px; }
+
+    .contact-links {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .contact-link {
+      padding: 12px 24px;
+      border-radius: 40px;
+      border: 1px solid rgba(255,255,255,0.15);
+      font-size: 0.9rem;
+      transition: all 0.3s;
+      /* Для удобного нажатия пальцем */
+      display: inline-block;
+    }
+    .contact-link:hover { border-color: var(--accent); color: var(--accent); }
+
+    footer {
+      text-align: center;
+      padding: 24px 16px;
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+
+    /* ===== АДАПТИВ ===== */
+    
+    /* Планшеты */
+    @media (max-width: 900px) {
+      .gallery-grid { column-count: 2; }
+    }
+
+    /* Телефоны */
+    @media (max-width: 560px) {
+      :root { 
+        --pad: 4px; 
+        --gap: 4px; 
+      }
+      
+      .hero { padding: 60px 16px 40px; }
+      .hero h1 { font-size: clamp(1.6rem, 6vw, 2.2rem); }
+      .hero p { font-size: 0.95rem; }
+      
+      .gallery-grid { column-count: 2; } /* Оставляем 2 колонки на телефоне */
+      
+      .contact { padding: 40px 16px 60px; }
+      
+      /* Кнопки контактов на всю ширину для удобства нажатия */
+      .contact-links {
+        flex-direction: column;
+        align-items: stretch;
+        max-width: 300px;
+        margin: 0 auto;
+      }
+      .contact-link {
+        width: 100%;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Приветствие -->
+  <section class="hero">
+    <div class="container">
+      <h1>Привет, я <span>Имя Фамилия</span></h1>
+      <p>Фотограф. Ловлю свет, эмоции и моменты, в которые хочется возвращаться.</p>
+    </div>
+  </section>
+
+  <!-- Галерея -->
+  <section class="gallery">
+    <div class="container">
+      <div class="gallery-grid" id="galleryGrid">
+        <div class="gallery-item"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='800'%3E%3Crect width='100%25' height='100%25' fill='%23333'/%3E%3Ctext x='50%25' y='50%25' fill='%23888' font-family='sans-serif' font-size='40' text-anchor='middle'%3E3:4%3C/text%3E%3C/svg%3E" alt="Работа 1" /></div>
+        <div class="gallery-item"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='600'%3E%3Crect width='100%25' height='100%25' fill='%232a2a2a'/%3E%3Ctext x='50%25' y='50%25' fill='%23888' font-family='sans-serif' font-size='40' text-anchor='middle'%3E4:3%3C/text%3E%3C/svg%3E" alt="Работа 2" /></div>
+        <div class="gallery-item"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='800'%3E%3Crect width='100%25' height='100%25' fill='%23333'/%3E%3Ctext x='50%25' y='50%25' fill='%23888' font-family='sans-serif' font-size='40' text-anchor='middle'%3E3:4%3C/text%3E%3C/svg%3E" alt="Работа 3" /></div>
+        <div class="gallery-item"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='600'%3E%3Crect width='100%25' height='100%25' fill='%232a2a2a'/%3E%3Ctext x='50%25' y='50%25' fill='%23888' font-family='sans-serif' font-size='40' text-anchor='middle'%3E4:3%3C/text%3E%3C/svg%3E" alt="Работа 4" /></div>
+        <div class="gallery-item"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='800'%3E%3Crect width='100%25' height='100%25' fill='%23333'/%3E%3Ctext x='50%25' y='50%25' fill='%23888' font-family='sans-serif' font-size='40' text-anchor='middle'%3E3:4%3C/text%3E%3C/svg%3E" alt="Работа 5" /></div>
+        <div class="gallery-item"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='600'%3E%3Crect width='100%25' height='100%25' fill='%232a2a2a'/%3E%3Ctext x='50%25' y='50%25' fill='%23888' font-family='sans-serif' font-size='40' text-anchor='middle'%3E4:3%3C/text%3E%3C/svg%3E" alt="Работа 6" /></div>
+        <div class="gallery-item"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='800'%3E%3Crect width='100%25' height='100%25' fill='%23333'/%3E%3Ctext x='50%25' y='50%25' fill='%23888' font-family='sans-serif' font-size='40' text-anchor='middle'%3E3:4%3C/text%3E%3C/svg%3E" alt="Работа 7" /></div>
+        <div class="gallery-item"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='600'%3E%3Crect width='100%25' height='100%25' fill='%232a2a2a'/%3E%3Ctext x='50%25' y='50%25' fill='%23888' font-family='sans-serif' font-size='40' text-anchor='middle'%3E4:3%3C/text%3E%3C/svg%3E" alt="Работа 8" /></div>
+        <div class="gallery-item"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='800'%3E%3Crect width='100%25' height='100%25' fill='%23333'/%3E%3Ctext x='50%25' y='50%25' fill='%23888' font-family='sans-serif' font-size='40' text-anchor='middle'%3E3:4%3C/text%3E%3C/svg%3E" alt="Работа 9" /></div>
+        <div class="gallery-item"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='600'%3E%3Crect width='100%25' height='100%25' fill='%232a2a2a'/%3E%3Ctext x='50%25' y='50%25' fill='%23888' font-family='sans-serif' font-size='40' text-anchor='middle'%3E4:3%3C/text%3E%3C/svg%3E" alt="Работа 10" /></div>
+        <div class="gallery-item"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='800'%3E%3Crect width='100%25' height='100%25' fill='%23333'/%3E%3Ctext x='50%25' y='50%25' fill='%23888' font-family='sans-serif' font-size='40' text-anchor='middle'%3E3:4%3C/text%3E%3C/svg%3E" alt="Работа 11" /></div>
+        <div class="gallery-item"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='600'%3E%3Crect width='100%25' height='100%25' fill='%232a2a2a'/%3E%3Ctext x='50%25' y='50%25' fill='%23888' font-family='sans-serif' font-size='40' text-anchor='middle'%3E4:3%3C/text%3E%3C/svg%3E" alt="Работа 12" /></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Контакты -->
+  <section class="contact">
+    <div class="container">
+      <h2>Связаться со мной</h2>
+      <p>Напишите, чтобы обсудить съёмку.</p>
+      <div class="contact-links">
+        <a href="mailto:hello@example.com" class="contact-link">hello@example.com</a>
+        <a href="https://t.me/username" target="_blank" rel="noopener" class="contact-link">Telegram</a>
+        <a href="https://instagram.com/username" target="_blank" rel="noopener" class="contact-link">Instagram</a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">© <span id="year"></span> Имя Фамилия</div>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const grid = document.getElementById('galleryGrid');
+      const items = Array.from(grid.children);
+      const shuffledItems = shuffleArray(items);
+      
+      grid.innerHTML = '';
+      shuffledItems.forEach(item => grid.appendChild(item));
+    });
+  </script>
+
+</body>
+</html>
