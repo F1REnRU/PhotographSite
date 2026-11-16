@@ -101,7 +101,7 @@
       box-shadow: 0 10px 30px rgba(0,0,0,0.5);
       transform: scale(0.95);
       transition: transform 0.3s ease;
-      opacity: 1; /* Лайтбокс всегда показываем сразу */
+      opacity: 1;
     }
     .lightbox.active .lightbox-img { transform: scale(1); }
     .lightbox-close {
@@ -153,24 +153,24 @@
   <section class="gallery">
     <div class="container">
       <div class="gallery-grid" id="galleryGrid">
-        <!-- 17 пар фотографий: превью (c...) и полное (без c) -->
-        <div class="gallery-item"><img src="c21.jpg" data-full="21.jpg" alt="Работа 1" loading="lazy" /></div>
-        <div class="gallery-item"><img src="c22.jpg" data-full="22.jpg" alt="Работа 2" loading="lazy" /></div>
-        <div class="gallery-item"><img src="c23.jpg" data-full="23.jpg" alt="Работа 3" loading="lazy" /></div>
-        <div class="gallery-item"><img src="c24.jpg" data-full="24.jpg" alt="Работа 4" loading="lazy" /></div>
-        <div class="gallery-item"><img src="c25.jpg" data-full="25.jpg" alt="Работа 5" loading="lazy" /></div>
-        <div class="gallery-item"><img src="c26.jpg" data-full="26.jpg" alt="Работа 6" loading="lazy" /></div>
-        <div class="gallery-item"><img src="c27.jpg" data-full="27.jpg" alt="Работа 7" loading="lazy" /></div>
-        <div class="gallery-item"><img src="c28.jpg" data-full="28.jpg" alt="Работа 8" loading="lazy" /></div>
-        <div class="gallery-item"><img src="c29.jpg" data-full="29.jpg" alt="Работа 9" loading="lazy" /></div>
-        <div class="gallery-item"><img src="c210.jpg" data-full="210.jpg" alt="Работа 10" loading="lazy" /></div>
-        <div class="gallery-item"><img src="c211.jpg" data-full="211.jpg" alt="Работа 11" loading="lazy" /></div>
-        <div class="gallery-item"><img src="c212.jpg" data-full="212.jpg" alt="Работа 12" loading="lazy" /></div>
-        <div class="gallery-item"><img src="c213.jpg" data-full="213.jpg" alt="Работа 13" loading="lazy" /></div>
-        <div class="gallery-item"><img src="c214.jpg" data-full="214.jpg" alt="Работа 14" loading="lazy" /></div>
-        <div class="gallery-item"><img src="c215.jpg" data-full="215.jpg" alt="Работа 15" loading="lazy" /></div>
-        <div class="gallery-item"><img src="c216.jpg" data-full="216.jpg" alt="Работа 16" loading="lazy" /></div>
-        <div class="gallery-item"><img src="c217.jpg" data-full="217.jpg" alt="Работа 17" loading="lazy" /></div>
+        <!-- Пути теперь начинаются с images/ -->
+        <div class="gallery-item"><img src="images/c21.jpg" data-full="images/21.jpg" alt="Работа 1" loading="lazy" /></div>
+        <div class="gallery-item"><img src="images/c22.jpg" data-full="images/22.jpg" alt="Работа 2" loading="lazy" /></div>
+        <div class="gallery-item"><img src="images/c23.jpg" data-full="images/23.jpg" alt="Работа 3" loading="lazy" /></div>
+        <div class="gallery-item"><img src="images/c24.jpg" data-full="images/24.jpg" alt="Работа 4" loading="lazy" /></div>
+        <div class="gallery-item"><img src="images/c25.jpg" data-full="images/25.jpg" alt="Работа 5" loading="lazy" /></div>
+        <div class="gallery-item"><img src="images/c26.jpg" data-full="images/26.jpg" alt="Работа 6" loading="lazy" /></div>
+        <div class="gallery-item"><img src="images/c27.jpg" data-full="images/27.jpg" alt="Работа 7" loading="lazy" /></div>
+        <div class="gallery-item"><img src="images/c28.jpg" data-full="images/28.jpg" alt="Работа 8" loading="lazy" /></div>
+        <div class="gallery-item"><img src="images/c29.jpg" data-full="images/29.jpg" alt="Работа 9" loading="lazy" /></div>
+        <div class="gallery-item"><img src="images/c210.jpg" data-full="images/210.jpg" alt="Работа 10" loading="lazy" /></div>
+        <div class="gallery-item"><img src="images/c211.jpg" data-full="images/211.jpg" alt="Работа 11" loading="lazy" /></div>
+        <div class="gallery-item"><img src="images/c212.jpg" data-full="images/212.jpg" alt="Работа 12" loading="lazy" /></div>
+        <div class="gallery-item"><img src="images/c213.jpg" data-full="images/213.jpg" alt="Работа 13" loading="lazy" /></div>
+        <div class="gallery-item"><img src="images/c214.jpg" data-full="images/214.jpg" alt="Работа 14" loading="lazy" /></div>
+        <div class="gallery-item"><img src="images/c215.jpg" data-full="images/215.jpg" alt="Работа 15" loading="lazy" /></div>
+        <div class="gallery-item"><img src="images/c216.jpg" data-full="images/216.jpg" alt="Работа 16" loading="lazy" /></div>
+        <div class="gallery-item"><img src="images/c217.jpg" data-full="images/217.jpg" alt="Работа 17" loading="lazy" /></div>
       </div>
     </div>
   </section>
@@ -222,7 +222,7 @@
       grid.innerHTML = '';
       shuffledItems.forEach(item => grid.appendChild(item));
 
-      // 2. Плавное появление картинок
+      // 2. Плавное появление картинок и клик для лайтбокса
       const galleryImages = document.querySelectorAll('.gallery-item img');
       galleryImages.forEach(img => {
         if (img.complete) {
@@ -231,9 +231,8 @@
           img.addEventListener('load', () => img.classList.add('loaded'));
         }
 
-        // 3. Клик по картинке — открываем лайтбокс
         img.addEventListener('click', (e) => {
-          // Берем полный размер из data-full (например, 21.jpg)
+          // Берем полный размер из data-full (например, images/21.jpg)
           const fullSrc = e.target.dataset.full || e.target.src;
           lightboxImg.src = fullSrc;
           lightbox.classList.add('active');
@@ -241,7 +240,7 @@
         });
       });
 
-      // 4. Закрытие лайтбокса
+      // 3. Закрытие лайтбокса
       function closeLightbox() {
         lightbox.classList.remove('active');
         document.body.style.overflow = '';
