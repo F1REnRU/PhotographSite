@@ -15,8 +15,8 @@
       --text: #f2f2f2;
       --muted: #9a9a9a;
       --accent: #d4af7a;
-      --gap: 6px;
-      --pad: 6px;
+      --gap: 12px; /* Увеличили расстояние между фото */
+      --pad: 12px; /* Увеличили отступы по краям */
     }
 
     * { 
@@ -64,7 +64,7 @@
       cursor: pointer;
       animation: fadeIn 0.6s ease forwards;
       opacity: 0;
-      aspect-ratio: 4 / 5; /* Задаем единый формат (вертикальный прямоугольник) */
+      aspect-ratio: 4 / 5; /* Единый формат ячейки */
     }
 
     @keyframes fadeIn { to { opacity: 1; } }
@@ -72,7 +72,7 @@
     .gallery-item img {
       width: 100%;
       height: 100%; 
-      object-fit: cover; /* Обрезает края, чтобы заполнить ячейку без искажений */
+      object-fit: cover; /* Заполняет ячейку без искажений */
       display: block;
       transition: transform 0.5s ease, opacity 0.4s ease;
       opacity: 0;
@@ -84,13 +84,7 @@
       .gallery-item:hover img { transform: scale(1.04); }
     }
 
-    /* Растягиваем последнюю (11-ю) фотографию на 2 колонки, чтобы не было дырки */
-    .gallery-item:last-child {
-      grid-column: span 2;
-      aspect-ratio: auto; /* Позволяем ей занять нужную высоту */
-    }
-
-    /* ===== ЛАЙТБОКС ===== */
+    /* ЛАЙТБОКС */
     .lightbox {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -154,10 +148,9 @@
     /* ===== АДАПТИВ ===== */
     @media (max-width: 900px) { 
       .gallery-grid { grid-template-columns: repeat(2, 1fr); } 
-      .gallery-item:last-child { grid-column: span 1; aspect-ratio: 4 / 5; } /* На планшетах возвращаем стандартный вид */
     }
     @media (max-width: 560px) {
-      :root { --pad: 4px; --gap: 4px; }
+      :root { --pad: 8px; --gap: 8px; } /* Уменьшаем отступы на мобильных, чтобы фото не были слишком мелкими */
       .hero { padding: 60px 16px 40px; }
       .hero h1 { font-size: clamp(1.6rem, 6vw, 2.2rem); }
       .hero p { font-size: 0.95rem; }
