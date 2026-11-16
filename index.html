@@ -97,7 +97,8 @@
       border-radius: 4px;
       box-shadow: none; 
       transform: scale(0.95);
-      transition: transform 0.3s ease, opacity 0.3s ease;
+      /* Плавные переходы для зума и смены фото */
+      transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.3s ease;
       cursor: zoom-in;
       opacity: 1;
       background: transparent;
@@ -107,6 +108,12 @@
 
     .lightbox-img.zoomed { transform: scale(1.8); cursor: zoom-out; }
     .lightbox.active .lightbox-img.zoomed { transform: scale(1.8); }
+
+    /* Класс для плавной смены кадров */
+    .lightbox-img.fading {
+      opacity: 0;
+      transform: scale(0.98); /* Легкое уменьшение при исчезновении */
+    }
 
     .lightbox-close {
       position: absolute;
@@ -197,12 +204,11 @@
     </div>
   </section>
 
-  <!-- ЛАЙТБОКС (добавлены стрелки) -->
   <div class="lightbox" id="lightbox">
     <span class="lightbox-close" id="lightboxClose">&times;</span>
-    <div class="lightbox-prev" id="lightboxPrev">&#10094;</div> <!-- Левая стрелка -->
+    <div class="lightbox-prev" id="lightboxPrev">&#10094;</div>
     <img src="" alt="Просмотр" class="lightbox-img" id="lightboxImg">
-    <div class="lightbox-next" id="lightboxNext">&#10095;</div> <!-- Правая стрелка -->
+    <div class="lightbox-next" id="lightboxNext">&#10095;</div>
   </div>
 
   <section class="contact">
@@ -233,6 +239,7 @@
       const galleryImages = Array.from(document.querySelectorAll('.gallery-item img'));
 
       let currentIndex = 0;
+      let isAnimating = false; // Защита от быстрых кликов
 
       // Плавное появление картинок в сетке
       galleryImages.forEach((img, index) => {
@@ -242,56 +249,83 @@
           img.addEventListener('load', () => img.classList.add('loaded'));
         }
 
-        // Клик по картинке в сетке
         img.addEventListener('click', (e) => {
-          currentIndex = index; // Запоминаем индекс текущей картинки
-          updateLightbox();
+          currentIndex = index;
+          // При открытии лайтбокса не анимируем затухание, просто показываем
+          const fullSrc = img.dataset.full || img.src;
+          lightboxImg.src = fullSrc;
+          lightboxImg.classList.remove('zoomed');
+          lightbox.classList.add('active');
+          document.body.style.overflow = 'hidden';
         });
       });
 
-      // Функция обновления картинки в лайтбоксе
-      function updateLightbox() {
-        const img = galleryImages[currentIndex];
-        const fullSrc = img.dataset.full || img.src;
-        
-        // Сбрасываем зум при перелистывании
+      // Функция для смены фото с анимацией
+      function changeImage(direction) {
+        if (isAnimating) return; // Блокируем клики во время анимации
+        isAnimating = true;
+
+        // 1. Убираем зум, если он был
         lightboxImg.classList.remove('zoomed');
-        lightboxImg.src = fullSrc;
         
-        lightbox.classList.add('active');
-        document.body.style.overflow = 'hidden';
+        // 2. Добавляем класс для плавного исчезновения
+        lightboxImg.classList.add('fading');
+
+        // 3. Ждем завершения анимации исчезновения (300мс)
+        setTimeout(() => {
+          // Меняем индекс
+          if (direction === 'next') {
+            currentIndex = (currentIndex + 1) % galleryImages.length;
+          } else {
+            currentIndex = (currentIndex - 1 + galleryImages.length) % galleryImages.length;
+          }
+
+          // Меняем картинку
+          const img = galleryImages[currentIndex];
+          lightboxImg.src = img.dataset.full || img.src;
+
+          // После загрузки новой картинки убираем класс fading (она плавно появится)
+          lightboxImg.onload = () => {
+            lightboxImg.classList.remove('fading');
+            isAnimating = false;
+          };
+          
+          // Страховка, если картинка уже в кэше и onload не сработает
+          if (lightboxImg.complete) {
+            setTimeout(() => {
+              lightboxImg.classList.remove('fading');
+              isAnimating = false;
+            }, 50);
+          }
+        }, 300);
       }
 
       // Клик по картинке внутри лайтбокса — зум
       lightboxImg.addEventListener('click', (e) => {
         e.stopPropagation();
-        lightboxImg.classList.toggle('zoomed');
+        // Не даем зумить, если картинка сейчас меняется
+        if (!isAnimating) {
+          lightboxImg.classList.toggle('zoomed');
+        }
       });
 
       // Листание вправо
       lightboxNext.addEventListener('click', (e) => {
         e.stopPropagation();
-        currentIndex = (currentIndex + 1) % galleryImages.length;
-        updateLightbox();
+        changeImage('next');
       });
 
       // Листание влево
       lightboxPrev.addEventListener('click', (e) => {
         e.stopPropagation();
-        currentIndex = (currentIndex - 1 + galleryImages.length) % galleryImages.length;
-        updateLightbox();
+        changeImage('prev');
       });
 
-      // Управление с клавиатуры (Стрелки влево/вправо)
+      // Управление с клавиатуры
       document.addEventListener('keydown', (e) => {
         if (lightbox.classList.contains('active')) {
-          if (e.key === 'ArrowRight') {
-            currentIndex = (currentIndex + 1) % galleryImages.length;
-            updateLightbox();
-          } else if (e.key === 'ArrowLeft') {
-            currentIndex = (currentIndex - 1 + galleryImages.length) % galleryImages.length;
-            updateLightbox();
-          }
+          if (e.key === 'ArrowRight') changeImage('next');
+          if (e.key === 'ArrowLeft') changeImage('prev');
         }
       });
 
@@ -302,13 +336,14 @@
         setTimeout(() => { 
           lightboxImg.src = ''; 
           lightboxImg.classList.remove('zoomed');
+          lightboxImg.classList.remove('fading');
+          isAnimating = false;
         }, 300);
       }
 
       lightboxClose.addEventListener('click', closeLightbox);
       
       lightbox.addEventListener('click', (e) => {
-        // Закрываем только если кликнули на фон (не на фото, стрелки или крестик)
         if (e.target === lightbox) closeLightbox();
       });
 
