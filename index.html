@@ -82,7 +82,6 @@
     .lightbox {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
-      /* Убрал серый фон, теперь только затемнение и размытие */
       background: rgba(10, 10, 10, 0.7); 
       z-index: 1000;
       display: flex;
@@ -91,10 +90,9 @@
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.3s ease;
-      /* Усилил размытие фона */
       backdrop-filter: blur(20px); 
       -webkit-backdrop-filter: blur(20px);
-      overflow: hidden; /* Чтобы увеличенная картинка не создавала скролл */
+      overflow: hidden;
     }
     .lightbox.active { opacity: 1; pointer-events: auto; }
 
@@ -104,16 +102,14 @@
       object-fit: contain;
       border-radius: 4px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-      /* Настройки для плавного зума */
       transform: scale(1);
       transition: transform 0.3s ease, opacity 0.3s ease;
       cursor: zoom-in;
       opacity: 1;
     }
     
-    /* Класс для увеличенного состояния */
     .lightbox-img.zoomed {
-      transform: scale(1.8); /* Масштаб увеличения */
+      transform: scale(1.8);
       cursor: zoom-out;
     }
 
@@ -162,7 +158,7 @@
   <section class="hero">
     <div class="container">
       <h1>Привет, я <span>Трухонин Данил</span></h1>
-      <p>Фотограф. Ловлю ваши самые яркие моменты, в которые точно захочется вернуться!</p>
+      <p>Ловлю ваши самые яркие моменты, в которые точно захочется вернуться!</p>
     </div>
   </section>
 
@@ -170,7 +166,6 @@
   <section class="gallery">
     <div class="container">
       <div class="gallery-grid" id="galleryGrid">
-        <!-- Порядок сохранен, как вы прописали -->
         <div class="gallery-item"><img src="images/21.jpg" data-full="images/c21.jpg" alt="Работа 1" loading="lazy" /></div>
         <div class="gallery-item"><img src="images/22.jpg" data-full="images/c22.jpg" alt="Работа 2" loading="lazy" /></div>
         <div class="gallery-item"><img src="images/24.jpg" data-full="images/c24.jpg" alt="Работа 4" loading="lazy" /></div>
@@ -233,7 +228,7 @@
         img.addEventListener('click', (e) => {
           const fullSrc = e.target.dataset.full || e.target.src;
           lightboxImg.src = fullSrc;
-          lightboxImg.classList.remove('zoomed'); // Сбрасываем зум при открытии новой
+          lightboxImg.classList.remove('zoomed');
           lightbox.classList.add('active');
           document.body.style.overflow = 'hidden';
         });
@@ -241,7 +236,7 @@
 
       // Клик по картинке внутри лайтбокса — зум
       lightboxImg.addEventListener('click', (e) => {
-        e.stopPropagation(); // Чтобы клик не закрывал лайтбокс
+        e.stopPropagation();
         lightboxImg.classList.toggle('zoomed');
       });
 
@@ -255,15 +250,12 @@
         }, 300);
       }
 
-      // Закрытие по крестику
       lightboxClose.addEventListener('click', closeLightbox);
       
-      // Закрытие по клику на пустое место (фон)
       lightbox.addEventListener('click', (e) => {
         if (e.target === lightbox) closeLightbox();
       });
 
-      // Закрытие по Escape
       document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && lightbox.classList.contains('active')) closeLightbox();
       });
