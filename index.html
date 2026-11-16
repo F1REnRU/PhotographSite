@@ -76,8 +76,8 @@
     .lightbox {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
-      /* Уменьшенное размытие и легкое затемнение (10%) */
-      background: rgba(0, 0, 0, 0.1); 
+      /* Затемнение 20%, Блюр 10px */
+      background: rgba(0, 0, 0, 0.2); 
       z-index: 2000;
       display: flex;
       justify-content: center;
@@ -85,13 +85,13 @@
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.3s ease;
-      backdrop-filter: blur(15px); 
-      -webkit-backdrop-filter: blur(15px);
+      backdrop-filter: blur(10px); 
+      -webkit-backdrop-filter: blur(10px);
       overflow: hidden;
     }
     .lightbox.active { opacity: 1; pointer-events: auto; }
 
-    /* Обертка для картинки, чтобы контролировать зум и сдвиг */
+    /* Обертка для картинки */
     .img-wrapper {
       display: flex;
       justify-content: center;
@@ -108,21 +108,26 @@
       object-fit: contain;
       border-radius: 4px;
       box-shadow: none; 
-      transition: transform 0.3s ease, opacity 0.3s ease;
+      transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
       cursor: zoom-in;
       opacity: 1;
       background: transparent;
-      transform-origin: center center;
+      /* Центрируем по умолчанию */
+      transform-origin: center center; 
     }
     
-    /* Зум по клику */
+    /* Стили для зума */
     .lightbox-img.zoomed { 
-      transform: scale(2); 
-      cursor: zoom-out; 
-      /* Позволяем перетаскивать */
+      transform: scale(2.5); /* Увеличил масштаб для детализации */
       cursor: grab;
     }
+    
     .lightbox-img.zoomed:active { cursor: grabbing; }
+
+    /* Отключаем анимацию при перетаскивании, чтобы не было задержек */
+    .lightbox-img.dragging {
+      transition: none !important;
+    }
 
     /* Анимации слайдера */
     .img-wrapper.slide-out-left { transform: translateX(-100vw) scale(0.9); opacity: 0; }
@@ -226,7 +231,6 @@
     </div>
   </section>
 
-  <!-- Лайтбокс с оберткой для анимации -->
   <div class="lightbox" id="lightbox">
     <span class="lightbox-close" id="lightboxClose">&times;</span>
     <div class="lightbox-prev" id="lightboxPrev">&#10094;</div>
@@ -269,12 +273,13 @@
       let currentIndex = 0;
       let isAnimating = false;
       
-      // Для зума и панорамирования
+      // Состояние зума
       let isZoomed = false;
       let isDragging = false;
-      let startX, startY, scrollLeft, scrollTop;
+      let startX = 0, startY = 0;
+      let translateX = 0, translateY = 0;
 
-      // Плавное появление картинок в сетке
+      // Инициализация галереи
       galleryImages.forEach((img, index) => {
         if (img.complete) img.classList.add('loaded');
         else img.addEventListener('load', () => img.classList.add('loaded'));
@@ -283,39 +288,101 @@
           currentIndex = index;
           const fullSrc = img.dataset.full || img.src;
           lightboxImg.src = fullSrc;
-          
-          // Сброс зума при открытии
           resetZoom();
           lightbox.classList.add('active');
           document.body.style.overflow = 'hidden';
         });
       });
 
-      // Функция для сброса зума
+      // Сброс зума (возврат в исходное состояние)
       function resetZoom() {
         isZoomed = false;
-        lightboxImg.classList.remove('zoomed');
-        lightboxImg.style.transform = '';
+        isDragging = false;
+        translateX = 0;
+        translateY = 0;
+        lightboxImg.classList.remove('zoomed', 'dragging');
         lightboxImg.style.transformOrigin = 'center center';
+        lightboxImg.style.transform = 'scale(1) translate(0, 0)';
+        lightboxImg.style.cursor = 'zoom-in';
       }
 
-      // Логика анимации слайдера
+      // Клик по картинке (Зум в точку курсора)
+      lightboxImg.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (isAnimating) return;
+
+        if (!isZoomed) {
+          // Приближаем
+          isZoomed = true;
+          
+          // Вычисляем позицию курсора относительно картинки в процентах
+          const rect = lightboxImg.getBoundingClientRect();
+          const x = ((e.clientX - rect.left) / rect.width) * 100;
+          const y = ((e.clientY - rect.top) / rect.height) * 100;
+          
+          // Устанавливаем точку, куда "смотрит" зум
+          lightboxImg.style.transformOrigin = `${x}% ${y}%`;
+          
+          // Применяем масштаб
+          lightboxImg.classList.add('zoomed');
+          lightboxImg.style.cursor = 'grab';
+          
+          // Сбрасываем смещение при зуме (чтобы начало от центра)
+          translateX = 0; 
+          translateY = 0;
+        } else {
+          // Отдаляем
+          resetZoom();
+        }
+      });
+
+      // Перетаскивание (Панорамирование) при зуме
+      lightboxImg.addEventListener('mousedown', (e) => {
+        if (!isZoomed) return;
+        e.preventDefault(); // Предотвращаем стандартное поведение браузера (например, перетаскивание картинки как файла)
+        
+        isDragging = true;
+        startX = e.clientX - translateX;
+        startY = e.clientY - translateY;
+        
+        lightboxImg.classList.add('dragging'); // Отключаем CSS-переходы для мгновенной реакции
+      });
+
+      window.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        
+        // Вычисляем новые координаты
+        translateX = e.clientX - startX;
+        translateY = e.clientY - startY;
+        
+        // Применяем трансформацию
+        lightboxImg.style.transform = `scale(2.5) translate(${translateX / 2.5}px, ${translateY / 2.5}px)`;
+      });
+
+      window.addEventListener('mouseup', () => {
+        if (isDragging) {
+          isDragging = false;
+          lightboxImg.classList.remove('dragging');
+        }
+      });
+
+      // Логика слайдера (перелистывание)
       function changeImage(direction) {
         if (isAnimating) return;
         isAnimating = true;
-
-        // Если фото было увеличено, сбрасываем зум перед сменой
+        
+        // Если фото было увеличено, принудительно сбрасываем зум перед сменой
         if (isZoomed) resetZoom();
 
-        // 1. Определяем класс для сдвига
+        // 1. Определяем классы для выезда/въезда
         const outClass = direction === 'next' ? 'slide-out-left' : 'slide-out-right';
         const inClass = direction === 'next' ? 'slide-in-right' : 'slide-in-left';
 
-        // 2. Уезжает
+        // 2. Анимация уезда текущей картинки
         imgWrapper.classList.add(outClass);
 
         setTimeout(() => {
-          // Меняем картинку
+          // Меняем индекс
           if (direction === 'next') {
             currentIndex = (currentIndex + 1) % galleryImages.length;
           } else {
@@ -325,17 +392,16 @@
           const img = galleryImages[currentIndex];
           lightboxImg.src = img.dataset.full || img.src;
 
-          // 3. Телепортируем за экран
+          // 3. Мгновенно телепортируем новую за край экрана
           imgWrapper.classList.remove(outClass);
           imgWrapper.classList.add(inClass);
 
-          // 4. Ждем загрузки и плавно выезжаем
+          // 4. Плавный въезд (с использованием requestAnimationFrame для надежности)
           const onImageReady = () => {
-            // Двойной requestAnimationFrame гарантирует, что браузер применит стартовую позицию перед анимацией
             requestAnimationFrame(() => {
               requestAnimationFrame(() => {
-                imgWrapper.classList.remove(inClass); // Убираем класс, картинка плавно едет в центр
-                setTimeout(() => { isAnimating = false; }, 400); // Ждем окончания анимации
+                imgWrapper.classList.remove(inClass); 
+                setTimeout(() => { isAnimating = false; }, 400); 
               });
             });
           };
@@ -343,65 +409,14 @@
           if (lightboxImg.complete) onImageReady();
           else lightboxImg.onload = onImageReady;
 
-        }, 400); // 400мс на уезд
+        }, 400); 
       }
 
-      // --- ЛОГИКА ЗУМА И ПАНОРАМИРОВАНИЯ ---
-
-      lightboxImg.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (isAnimating) return;
-
-        isZoomed = !isZoomed;
-
-        if (isZoomed) {
-          // Зумим в точку клика
-          const rect = lightboxImg.getBoundingClientRect();
-          const x = ((e.clientX - rect.left) / rect.width) * 100;
-          const y = ((e.clientY - rect.top) / rect.height) * 100;
-          
-          lightboxImg.style.transformOrigin = `${x}% ${y}%`;
-          lightboxImg.classList.add('zoomed');
-        } else {
-          resetZoom();
-        }
-      });
-
-      // Перетаскивание (панорамирование) при зуме
-      lightboxImg.addEventListener('mousedown', (e) => {
-        if (!isZoomed) return;
-        isDragging = true;
-        startX = e.clientX - lightboxImg.offsetLeft;
-        startY = e.clientY - lightboxImg.offsetTop;
-        lightboxImg.style.cursor = 'grabbing';
-        lightboxImg.style.transition = 'none'; // Отключаем плавность при перетаскивании
-      });
-
-      window.addEventListener('mousemove', (e) => {
-        if (!isDragging) return;
-        e.preventDefault();
-        const x = e.clientX - startX;
-        const y = e.clientY - startY;
-        
-        // Сдвигаем картинку
-        lightboxImg.style.transform = `scale(2) translate(${x / 2}px, ${y / 2}px)`;
-      });
-
-      window.addEventListener('mouseup', () => {
-        if (isDragging) {
-          isDragging = false;
-          lightboxImg.style.cursor = 'grab';
-          lightboxImg.style.transition = 'transform 0.3s ease'; // Возвращаем плавность
-        }
-      });
-
-      // --- КОНЕЦ ЛОГИКИ ЗУМА ---
-
-      // Кнопки
+      // Навешиваем события на кнопки
       lightboxNext.addEventListener('click', (e) => { e.stopPropagation(); changeImage('next'); });
       lightboxPrev.addEventListener('click', (e) => { e.stopPropagation(); changeImage('prev'); });
 
-      // Клавиатура
+      // Управление с клавиатуры
       document.addEventListener('keydown', (e) => {
         if (lightbox.classList.contains('active')) {
           if (e.key === 'ArrowRight') changeImage('next');
