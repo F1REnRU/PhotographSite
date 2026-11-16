@@ -47,35 +47,47 @@
     .hero h1 span { color: var(--accent); }
     .hero p { color: var(--muted); max-width: 520px; margin: 0 auto; font-size: 1rem; }
 
-    /* ===== ГАЛЕРЕЯ ===== */
+    /* ===== ГАЛЕРЕЯ (Жесткая сетка) ===== */
     .gallery { padding: 10px 0 60px; }
-    .gallery-grid { column-count: 3; column-gap: var(--gap); }
+    
+    .gallery-grid { 
+      display: grid; 
+      grid-template-columns: repeat(3, 1fr); /* Строго 3 колонки */
+      gap: var(--gap); 
+    }
 
     .gallery-item {
-      break-inside: avoid;
-      margin-bottom: var(--gap);
+      position: relative;
       border-radius: 4px;
       overflow: hidden;
       background: #161616;
       cursor: pointer;
-      position: relative;
       animation: fadeIn 0.6s ease forwards;
       opacity: 0;
+      aspect-ratio: 4 / 5; /* Задаем единый формат (вертикальный прямоугольник) */
     }
 
     @keyframes fadeIn { to { opacity: 1; } }
 
     .gallery-item img {
       width: 100%;
-      height: auto;
+      height: 100%; 
+      object-fit: cover; /* Обрезает края, чтобы заполнить ячейку без искажений */
       display: block;
       transition: transform 0.5s ease, opacity 0.4s ease;
       opacity: 0;
     }
+    
     .gallery-item img.loaded { opacity: 1; }
 
     @media (hover: hover) {
       .gallery-item:hover img { transform: scale(1.04); }
+    }
+
+    /* Растягиваем последнюю (11-ю) фотографию на 2 колонки, чтобы не было дырки */
+    .gallery-item:last-child {
+      grid-column: span 2;
+      aspect-ratio: auto; /* Позволяем ей занять нужную высоту */
     }
 
     /* ===== ЛАЙТБОКС ===== */
@@ -106,7 +118,7 @@
       transition: transform 0.3s ease, opacity 0.3s ease;
       cursor: zoom-in;
       opacity: 1;
-      background: transparent; /* Убирает серый фон */
+      background: transparent;
     }
     
     .lightbox-img.zoomed {
@@ -140,13 +152,16 @@
     footer { text-align: center; padding: 24px 16px; color: var(--muted); font-size: 0.8rem; }
 
     /* ===== АДАПТИВ ===== */
-    @media (max-width: 900px) { .gallery-grid { column-count: 2; } }
+    @media (max-width: 900px) { 
+      .gallery-grid { grid-template-columns: repeat(2, 1fr); } 
+      .gallery-item:last-child { grid-column: span 1; aspect-ratio: 4 / 5; } /* На планшетах возвращаем стандартный вид */
+    }
     @media (max-width: 560px) {
       :root { --pad: 4px; --gap: 4px; }
       .hero { padding: 60px 16px 40px; }
       .hero h1 { font-size: clamp(1.6rem, 6vw, 2.2rem); }
       .hero p { font-size: 0.95rem; }
-      .gallery-grid { column-count: 2; }
+      .gallery-grid { grid-template-columns: repeat(2, 1fr); }
       .contact { padding: 40px 16px 60px; }
       .contact-links { flex-direction: column; align-items: stretch; max-width: 300px; margin: 0 auto; }
       .contact-link { width: 100%; text-align: center; }
@@ -166,27 +181,25 @@
   <!-- Галерея -->
   <section class="gallery">
     <div class="container">
-        <div class="gallery-grid" id="galleryGrid">
-          <!-- РЯД 1: Зеленая серия (ритм и атмосфера) -->
-          <div class="gallery-item"><img src="images/26.jpg" data-full="images/c26.jpg" alt="Работа 6" loading="lazy" /></div>
-          <div class="gallery-item"><img src="images/27.jpg" data-full="images/c27.jpg" alt="Работа 7" loading="lazy" /></div>
-          <div class="gallery-item"><img src="images/29.jpg" data-full="images/c29.jpg" alt="Работа 9" loading="lazy" /></div>
+      <div class="gallery-grid" id="galleryGrid">
+        <!-- РЯД 1: Зеленая серия -->
+        <div class="gallery-item"><img src="images/26.jpg" data-full="images/c26.jpg" alt="Работа 6" loading="lazy" /></div>
+        <div class="gallery-item"><img src="images/27.jpg" data-full="images/c27.jpg" alt="Работа 7" loading="lazy" /></div>
+        <div class="gallery-item"><img src="images/29.jpg" data-full="images/c29.jpg" alt="Работа 9" loading="lazy" /></div>
 
-          <!-- РЯД 2: Спорт (динамика) и Сцена (левая) -->
-          <div class="gallery-item"><img src="images/21.jpg" data-full="images/c21.jpg" alt="Работа 1" loading="lazy" /></div>
-          <div class="gallery-item"><img src="images/22.jpg" data-full="images/c22.jpg" alt="Работа 2" loading="lazy" /></div>
-          <div class="gallery-item"><img src="images/24.jpg" data-full="images/c24.jpg" alt="Работа 4" loading="lazy" /></div>
+        <!-- РЯД 2: Спорт и Сцена -->
+        <div class="gallery-item"><img src="images/21.jpg" data-full="images/c21.jpg" alt="Работа 1" loading="lazy" /></div>
+        <div class="gallery-item"><img src="images/22.jpg" data-full="images/c22.jpg" alt="Работа 2" loading="lazy" /></div>
+        <div class="gallery-item"><img src="images/24.jpg" data-full="images/c24.jpg" alt="Работа 4" loading="lazy" /></div>
 
-          <!-- РЯД 3: Искусство и портреты (Саксофон, Граффити, Зонт 1) -->
-          <div class="gallery-item"><img src="images/211.jpg" data-full="images/c211.jpg" alt="Работа 11" loading="lazy" /></div>
-          <div class="gallery-item"><img src="images/213.jpg" data-full="images/c213.jpg" alt="Работа 13" loading="lazy" /></div>
-          <div class="gallery-item"><img src="images/215.jpg" data-full="images/c215.jpg" alt="Работа 15" loading="lazy" /></div>
+        <!-- РЯД 3: Искусство и портреты -->
+        <div class="gallery-item"><img src="images/211.jpg" data-full="images/c211.jpg" alt="Работа 11" loading="lazy" /></div>
+        <div class="gallery-item"><img src="images/213.jpg" data-full="images/c213.jpg" alt="Работа 13" loading="lazy" /></div>
+        <div class="gallery-item"><img src="images/215.jpg" data-full="images/c215.jpg" alt="Работа 15" loading="lazy" /></div>
 
-          <!-- РЯД 4: Финал (Портреты и широкий кадр) -->
-          <div class="gallery-item"><img src="images/210.jpg" data-full="images/c210.jpg" alt="Работа 10" loading="lazy" /></div>
-          <div class="gallery-item"><img src="images/216.jpg" data-full="images/c216.jpg" alt="Работа 16" loading="lazy" /></div>
-          <div class="gallery-item"><img src="images/217.jpg" data-full="images/c217.jpg" alt="Работа 17" loading="lazy" /></div>
-        </div>
+        <!-- РЯД 4: Финал (два портрета) -->
+        <div class="gallery-item"><img src="images/216.jpg" data-full="images/c216.jpg" alt="Работа 16" loading="lazy" /></div>
+        <div class="gallery-item"><img src="images/217.jpg" data-full="images/c217.jpg" alt="Работа 17" loading="lazy" /></div>
       </div>
     </div>
   </section>
@@ -223,7 +236,6 @@
       const lightboxClose = document.getElementById('lightboxClose');
       const galleryImages = document.querySelectorAll('.gallery-item img');
 
-      // Плавное появление картинок в сетке
       galleryImages.forEach(img => {
         if (img.complete) {
           img.classList.add('loaded');
@@ -231,7 +243,6 @@
           img.addEventListener('load', () => img.classList.add('loaded'));
         }
 
-        // Клик по картинке в сетке — открываем лайтбокс
         img.addEventListener('click', (e) => {
           const fullSrc = e.target.dataset.full || e.target.src;
           lightboxImg.src = fullSrc;
@@ -241,13 +252,11 @@
         });
       });
 
-      // Клик по картинке внутри лайтбокса — зум
       lightboxImg.addEventListener('click', (e) => {
         e.stopPropagation();
         lightboxImg.classList.toggle('zoomed');
       });
 
-      // Закрытие лайтбокса
       function closeLightbox() {
         lightbox.classList.remove('active');
         document.body.style.overflow = '';
