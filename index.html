@@ -153,24 +153,24 @@
   <section class="gallery">
     <div class="container">
       <div class="gallery-grid" id="galleryGrid">
-        <!-- Пути теперь начинаются с images/ -->
-        <div class="gallery-item"><img src="images/c21.jpg" data-full="images/21.jpg" alt="Работа 1" loading="lazy" /></div>
-        <div class="gallery-item"><img src="images/c22.jpg" data-full="images/22.jpg" alt="Работа 2" loading="lazy" /></div>
-        <div class="gallery-item"><img src="images/c23.jpg" data-full="images/23.jpg" alt="Работа 3" loading="lazy" /></div>
-        <div class="gallery-item"><img src="images/c24.jpg" data-full="images/24.jpg" alt="Работа 4" loading="lazy" /></div>
-        <div class="gallery-item"><img src="images/c25.jpg" data-full="images/25.jpg" alt="Работа 5" loading="lazy" /></div>
-        <div class="gallery-item"><img src="images/c26.jpg" data-full="images/26.jpg" alt="Работа 6" loading="lazy" /></div>
-        <div class="gallery-item"><img src="images/c27.jpg" data-full="images/27.jpg" alt="Работа 7" loading="lazy" /></div>
-        <div class="gallery-item"><img src="images/c28.jpg" data-full="images/28.jpg" alt="Работа 8" loading="lazy" /></div>
-        <div class="gallery-item"><img src="images/c29.jpg" data-full="images/29.jpg" alt="Работа 9" loading="lazy" /></div>
-        <div class="gallery-item"><img src="images/c210.jpg" data-full="images/210.jpg" alt="Работа 10" loading="lazy" /></div>
-        <div class="gallery-item"><img src="images/c211.jpg" data-full="images/211.jpg" alt="Работа 11" loading="lazy" /></div>
-        <div class="gallery-item"><img src="images/c212.jpg" data-full="images/212.jpg" alt="Работа 12" loading="lazy" /></div>
-        <div class="gallery-item"><img src="images/c213.jpg" data-full="images/213.jpg" alt="Работа 13" loading="lazy" /></div>
-        <div class="gallery-item"><img src="images/c214.jpg" data-full="images/214.jpg" alt="Работа 14" loading="lazy" /></div>
-        <div class="gallery-item"><img src="images/c215.jpg" data-full="images/215.jpg" alt="Работа 15" loading="lazy" /></div>
-        <div class="gallery-item"><img src="images/c216.jpg" data-full="images/216.jpg" alt="Работа 16" loading="lazy" /></div>
-        <div class="gallery-item"><img src="images/c217.jpg" data-full="images/217.jpg" alt="Работа 17" loading="lazy" /></div>
+        <!-- В сетке показываем кроп (21.jpg), полный размер берем из data-full (c21.jpg) -->
+        <div class="gallery-item"><img src="images/21.jpg" data-full="images/c21.jpg" alt="Работа 1" loading="lazy" /></div>
+        <div class="gallery-item"><img src="images/22.jpg" data-full="images/c22.jpg" alt="Работа 2" loading="lazy" /></div>
+        <div class="gallery-item"><img src="images/23.jpg" data-full="images/c23.jpg" alt="Работа 3" loading="lazy" /></div>
+        <div class="gallery-item"><img src="images/24.jpg" data-full="images/c24.jpg" alt="Работа 4" loading="lazy" /></div>
+        <div class="gallery-item"><img src="images/25.jpg" data-full="images/c25.jpg" alt="Работа 5" loading="lazy" /></div>
+        <div class="gallery-item"><img src="images/26.jpg" data-full="images/c26.jpg" alt="Работа 6" loading="lazy" /></div>
+        <div class="gallery-item"><img src="images/27.jpg" data-full="images/c27.jpg" alt="Работа 7" loading="lazy" /></div>
+        <div class="gallery-item"><img src="images/28.jpg" data-full="images/c28.jpg" alt="Работа 8" loading="lazy" /></div>
+        <div class="gallery-item"><img src="images/29.jpg" data-full="images/c29.jpg" alt="Работа 9" loading="lazy" /></div>
+        <div class="gallery-item"><img src="images/210.jpg" data-full="images/c210.jpg" alt="Работа 10" loading="lazy" /></div>
+        <div class="gallery-item"><img src="images/211.jpg" data-full="images/c211.jpg" alt="Работа 11" loading="lazy" /></div>
+        <div class="gallery-item"><img src="images/212.jpg" data-full="images/c212.jpg" alt="Работа 12" loading="lazy" /></div>
+        <div class="gallery-item"><img src="images/213.jpg" data-full="images/c213.jpg" alt="Работа 13" loading="lazy" /></div>
+        <div class="gallery-item"><img src="images/214.jpg" data-full="images/c214.jpg" alt="Работа 14" loading="lazy" /></div>
+        <div class="gallery-item"><img src="images/215.jpg" data-full="images/c215.jpg" alt="Работа 15" loading="lazy" /></div>
+        <div class="gallery-item"><img src="images/216.jpg" data-full="images/c216.jpg" alt="Работа 16" loading="lazy" /></div>
+        <div class="gallery-item"><img src="images/217.jpg" data-full="images/c217.jpg" alt="Работа 17" loading="lazy" /></div>
       </div>
     </div>
   </section>
@@ -231,8 +231,9 @@
           img.addEventListener('load', () => img.classList.add('loaded'));
         }
 
+        // Клик по картинке
         img.addEventListener('click', (e) => {
-          // Берем полный размер из data-full (например, images/21.jpg)
+          // Берем полный размер из data-full (например, images/c21.jpg)
           const fullSrc = e.target.dataset.full || e.target.src;
           lightboxImg.src = fullSrc;
           lightbox.classList.add('active');
