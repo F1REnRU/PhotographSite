@@ -82,7 +82,8 @@
     .lightbox {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(14, 14, 14, 0.95);
+      /* Убрал серый фон, теперь только затемнение и размытие */
+      background: rgba(10, 10, 10, 0.7); 
       z-index: 1000;
       display: flex;
       justify-content: center;
@@ -90,25 +91,41 @@
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.3s ease;
-      backdrop-filter: blur(8px);
+      /* Усилил размытие фона */
+      backdrop-filter: blur(20px); 
+      -webkit-backdrop-filter: blur(20px);
+      overflow: hidden; /* Чтобы увеличенная картинка не создавала скролл */
     }
     .lightbox.active { opacity: 1; pointer-events: auto; }
+
     .lightbox-img {
       max-width: 90vw;
       max-height: 90vh;
       object-fit: contain;
       border-radius: 4px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-      transform: scale(0.95);
-      transition: transform 0.3s ease;
+      /* Настройки для плавного зума */
+      transform: scale(1);
+      transition: transform 0.3s ease, opacity 0.3s ease;
+      cursor: zoom-in;
       opacity: 1;
     }
+    
+    /* Класс для увеличенного состояния */
+    .lightbox-img.zoomed {
+      transform: scale(1.8); /* Масштаб увеличения */
+      cursor: zoom-out;
+    }
+
     .lightbox.active .lightbox-img { transform: scale(1); }
+    .lightbox.active .lightbox-img.zoomed { transform: scale(1.8); }
+
     .lightbox-close {
       position: absolute;
       top: 20px; right: 20px;
       color: #fff; font-size: 40px; line-height: 1;
       cursor: pointer; opacity: 0.6; transition: opacity 0.2s;
+      z-index: 1010;
     }
     .lightbox-close:hover { opacity: 1; }
 
@@ -153,7 +170,7 @@
   <section class="gallery">
     <div class="container">
       <div class="gallery-grid" id="galleryGrid">
-        <!-- В сетке показываем кроп (21.jpg), полный размер берем из data-full (c21.jpg) -->
+        <!-- Порядок сохранен, как вы прописали -->
         <div class="gallery-item"><img src="images/21.jpg" data-full="images/c21.jpg" alt="Работа 1" loading="lazy" /></div>
         <div class="gallery-item"><img src="images/22.jpg" data-full="images/c22.jpg" alt="Работа 2" loading="lazy" /></div>
         <div class="gallery-item"><img src="images/24.jpg" data-full="images/c24.jpg" alt="Работа 4" loading="lazy" /></div>
@@ -198,29 +215,13 @@
   <script>
     document.getElementById('year').textContent = new Date().getFullYear();
 
-    // Перемешивание массива (Фишер-Йетс)
-    function shuffleArray(array) {
-      for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-      }
-      return array;
-    }
-
     document.addEventListener('DOMContentLoaded', () => {
-      const grid = document.getElementById('galleryGrid');
       const lightbox = document.getElementById('lightbox');
       const lightboxImg = document.getElementById('lightboxImg');
       const lightboxClose = document.getElementById('lightboxClose');
-
-      // 1. Перемешиваем галерею
-      const items = Array.from(grid.children);
-      const shuffledItems = shuffleArray(items);
-      grid.innerHTML = '';
-      shuffledItems.forEach(item => grid.appendChild(item));
-
-      // 2. Плавное появление картинок и клик для лайтбокса
       const galleryImages = document.querySelectorAll('.gallery-item img');
+
+      // Плавное появление картинок в сетке
       galleryImages.forEach(img => {
         if (img.complete) {
           img.classList.add('loaded');
@@ -228,27 +229,41 @@
           img.addEventListener('load', () => img.classList.add('loaded'));
         }
 
-        // Клик по картинке
+        // Клик по картинке в сетке — открываем лайтбокс
         img.addEventListener('click', (e) => {
-          // Берем полный размер из data-full (например, images/c21.jpg)
           const fullSrc = e.target.dataset.full || e.target.src;
           lightboxImg.src = fullSrc;
+          lightboxImg.classList.remove('zoomed'); // Сбрасываем зум при открытии новой
           lightbox.classList.add('active');
           document.body.style.overflow = 'hidden';
         });
       });
 
-      // 3. Закрытие лайтбокса
+      // Клик по картинке внутри лайтбокса — зум
+      lightboxImg.addEventListener('click', (e) => {
+        e.stopPropagation(); // Чтобы клик не закрывал лайтбокс
+        lightboxImg.classList.toggle('zoomed');
+      });
+
+      // Закрытие лайтбокса
       function closeLightbox() {
         lightbox.classList.remove('active');
         document.body.style.overflow = '';
-        setTimeout(() => { lightboxImg.src = ''; }, 300);
+        setTimeout(() => { 
+          lightboxImg.src = ''; 
+          lightboxImg.classList.remove('zoomed');
+        }, 300);
       }
 
+      // Закрытие по крестику
       lightboxClose.addEventListener('click', closeLightbox);
+      
+      // Закрытие по клику на пустое место (фон)
       lightbox.addEventListener('click', (e) => {
         if (e.target === lightbox) closeLightbox();
       });
+
+      // Закрытие по Escape
       document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && lightbox.classList.contains('active')) closeLightbox();
       });
