@@ -117,6 +117,32 @@
     }
     .lightbox-close:hover { opacity: 1; }
 
+    /* СТРЕЛКИ ПЕРЕЛИСТЫВАНИЯ */
+    .lightbox-prev, .lightbox-next {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 50px;
+      font-weight: 100;
+      cursor: pointer;
+      padding: 20px;
+      user-select: none;
+      transition: color 0.2s, transform 0.2s;
+      z-index: 2010;
+    }
+    .lightbox-prev { left: 20px; }
+    .lightbox-next { right: 20px; }
+    
+    .lightbox-prev:hover, .lightbox-next:hover {
+      color: rgba(255, 255, 255, 1);
+      transform: translateY(-50%) scale(1.1);
+    }
+
+    @media (max-width: 560px) {
+      .lightbox-prev, .lightbox-next { font-size: 30px; padding: 10px; }
+    }
+
     /* Контакты */
     .contact { text-align: center; padding: 60px 16px 80px; border-top: 1px solid rgba(255,255,255,0.07); }
     .contact h2 { font-size: clamp(1.4rem, 4vw, 2.4rem); font-weight: 500; margin-bottom: 12px; }
@@ -171,9 +197,12 @@
     </div>
   </section>
 
+  <!-- ЛАЙТБОКС (добавлены стрелки) -->
   <div class="lightbox" id="lightbox">
     <span class="lightbox-close" id="lightboxClose">&times;</span>
+    <div class="lightbox-prev" id="lightboxPrev">&#10094;</div> <!-- Левая стрелка -->
     <img src="" alt="Просмотр" class="lightbox-img" id="lightboxImg">
+    <div class="lightbox-next" id="lightboxNext">&#10095;</div> <!-- Правая стрелка -->
   </div>
 
   <section class="contact">
@@ -199,29 +228,74 @@
       const lightbox = document.getElementById('lightbox');
       const lightboxImg = document.getElementById('lightboxImg');
       const lightboxClose = document.getElementById('lightboxClose');
-      const galleryImages = document.querySelectorAll('.gallery-item img');
+      const lightboxPrev = document.getElementById('lightboxPrev');
+      const lightboxNext = document.getElementById('lightboxNext');
+      const galleryImages = Array.from(document.querySelectorAll('.gallery-item img'));
 
-      galleryImages.forEach(img => {
+      let currentIndex = 0;
+
+      // Плавное появление картинок в сетке
+      galleryImages.forEach((img, index) => {
         if (img.complete) {
           img.classList.add('loaded');
         } else {
           img.addEventListener('load', () => img.classList.add('loaded'));
         }
 
+        // Клик по картинке в сетке
         img.addEventListener('click', (e) => {
-          const fullSrc = e.target.dataset.full || e.target.src;
-          lightboxImg.src = fullSrc;
-          lightboxImg.classList.remove('zoomed');
-          lightbox.classList.add('active');
-          document.body.style.overflow = 'hidden'; // Блокируем скролл фона
+          currentIndex = index; // Запоминаем индекс текущей картинки
+          updateLightbox();
         });
       });
 
+      // Функция обновления картинки в лайтбоксе
+      function updateLightbox() {
+        const img = galleryImages[currentIndex];
+        const fullSrc = img.dataset.full || img.src;
+        
+        // Сбрасываем зум при перелистывании
+        lightboxImg.classList.remove('zoomed');
+        lightboxImg.src = fullSrc;
+        
+        lightbox.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+
+      // Клик по картинке внутри лайтбокса — зум
       lightboxImg.addEventListener('click', (e) => {
         e.stopPropagation();
         lightboxImg.classList.toggle('zoomed');
       });
 
+      // Листание вправо
+      lightboxNext.addEventListener('click', (e) => {
+        e.stopPropagation();
+        currentIndex = (currentIndex + 1) % galleryImages.length;
+        updateLightbox();
+      });
+
+      // Листание влево
+      lightboxPrev.addEventListener('click', (e) => {
+        e.stopPropagation();
+        currentIndex = (currentIndex - 1 + galleryImages.length) % galleryImages.length;
+        updateLightbox();
+      });
+
+      // Управление с клавиатуры (Стрелки влево/вправо)
+      document.addEventListener('keydown', (e) => {
+        if (lightbox.classList.contains('active')) {
+          if (e.key === 'ArrowRight') {
+            currentIndex = (currentIndex + 1) % galleryImages.length;
+            updateLightbox();
+          } else if (e.key === 'ArrowLeft') {
+            currentIndex = (currentIndex - 1 + galleryImages.length) % galleryImages.length;
+            updateLightbox();
+          }
+        }
+      });
+
+      // Закрытие лайтбокса
       function closeLightbox() {
         lightbox.classList.remove('active');
         document.body.style.overflow = '';
@@ -234,6 +308,7 @@
       lightboxClose.addEventListener('click', closeLightbox);
       
       lightbox.addEventListener('click', (e) => {
+        // Закрываем только если кликнули на фон (не на фото, стрелки или крестик)
         if (e.target === lightbox) closeLightbox();
       });
 
