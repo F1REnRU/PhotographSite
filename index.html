@@ -15,8 +15,8 @@
       --text: #f2f2f2;
       --muted: #9a9a9a;
       --accent: #d4af7a;
-      --gap: 12px; /* Увеличили расстояние между фото */
-      --pad: 12px; /* Увеличили отступы по краям */
+      --gap: 16px; /* Увеличенный зазор между фото */
+      --pad: 16px; /* Отступы по краям */
     }
 
     * { 
@@ -39,7 +39,13 @@
     img { display: block; width: 100%; height: auto; background: #161616; }
     a { color: inherit; text-decoration: none; }
 
-    .container { width: 100%; padding: 0 var(--pad); }
+    /* Ограничиваем максимальную ширину контента, чтобы на больших экранах не было гигантских фото */
+    .container { 
+      width: 100%; 
+      max-width: 1400px; 
+      margin: 0 auto; 
+      padding: 0 var(--pad); 
+    }
 
     /* Приветствие */
     .hero { text-align: center; padding: 80px 16px 50px; }
@@ -52,7 +58,7 @@
     
     .gallery-grid { 
       display: grid; 
-      grid-template-columns: repeat(3, 1fr); /* Строго 3 колонки */
+      grid-template-columns: repeat(3, 1fr);
       gap: var(--gap); 
     }
 
@@ -64,7 +70,7 @@
       cursor: pointer;
       animation: fadeIn 0.6s ease forwards;
       opacity: 0;
-      aspect-ratio: 4 / 5; /* Единый формат ячейки */
+      aspect-ratio: 4 / 5; /* Пропорции ячейки */
     }
 
     @keyframes fadeIn { to { opacity: 1; } }
@@ -72,7 +78,7 @@
     .gallery-item img {
       width: 100%;
       height: 100%; 
-      object-fit: cover; /* Заполняет ячейку без искажений */
+      object-fit: cover;
       display: block;
       transition: transform 0.5s ease, opacity 0.4s ease;
       opacity: 0;
@@ -84,7 +90,7 @@
       .gallery-item:hover img { transform: scale(1.04); }
     }
 
-    /* ЛАЙТБОКС */
+    /* ===== ЛАЙТБОКС ===== */
     .lightbox {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -150,7 +156,7 @@
       .gallery-grid { grid-template-columns: repeat(2, 1fr); } 
     }
     @media (max-width: 560px) {
-      :root { --pad: 8px; --gap: 8px; } /* Уменьшаем отступы на мобильных, чтобы фото не были слишком мелкими */
+      :root { --pad: 8px; --gap: 8px; }
       .hero { padding: 60px 16px 40px; }
       .hero h1 { font-size: clamp(1.6rem, 6vw, 2.2rem); }
       .hero p { font-size: 0.95rem; }
@@ -175,22 +181,22 @@
   <section class="gallery">
     <div class="container">
       <div class="gallery-grid" id="galleryGrid">
-        <!-- РЯД 1: Зеленая серия -->
+        <!-- РЯД 1 -->
         <div class="gallery-item"><img src="images/26.jpg" data-full="images/c26.jpg" alt="Работа 6" loading="lazy" /></div>
         <div class="gallery-item"><img src="images/27.jpg" data-full="images/c27.jpg" alt="Работа 7" loading="lazy" /></div>
         <div class="gallery-item"><img src="images/29.jpg" data-full="images/c29.jpg" alt="Работа 9" loading="lazy" /></div>
 
-        <!-- РЯД 2: Спорт и Сцена -->
+        <!-- РЯД 2 -->
         <div class="gallery-item"><img src="images/21.jpg" data-full="images/c21.jpg" alt="Работа 1" loading="lazy" /></div>
         <div class="gallery-item"><img src="images/22.jpg" data-full="images/c22.jpg" alt="Работа 2" loading="lazy" /></div>
         <div class="gallery-item"><img src="images/24.jpg" data-full="images/c24.jpg" alt="Работа 4" loading="lazy" /></div>
 
-        <!-- РЯД 3: Искусство и портреты -->
+        <!-- РЯД 3 -->
         <div class="gallery-item"><img src="images/211.jpg" data-full="images/c211.jpg" alt="Работа 11" loading="lazy" /></div>
         <div class="gallery-item"><img src="images/213.jpg" data-full="images/c213.jpg" alt="Работа 13" loading="lazy" /></div>
         <div class="gallery-item"><img src="images/215.jpg" data-full="images/c215.jpg" alt="Работа 15" loading="lazy" /></div>
 
-        <!-- РЯД 4: Финал (два портрета) -->
+        <!-- РЯД 4 -->
         <div class="gallery-item"><img src="images/216.jpg" data-full="images/c216.jpg" alt="Работа 16" loading="lazy" /></div>
         <div class="gallery-item"><img src="images/217.jpg" data-full="images/c217.jpg" alt="Работа 17" loading="lazy" /></div>
       </div>
