@@ -269,6 +269,7 @@
       const galleryImages = Array.from(document.querySelectorAll('.gallery-item img'));
 
       let currentIndex = 0;
+      let isAnimating = false; // Блокировка от быстрых кликов
       
       // Состояние зума и перетаскивания
       let isZoomed = false;
@@ -353,6 +354,8 @@
 
       // Логика зума
       function handleImageClick(e) {
+        if (isAnimating) return;
+
         if (!isZoomed) {
           isZoomed = true;
           const rect = lightboxImg.getBoundingClientRect();
@@ -374,9 +377,12 @@
         }
       }
 
-      // --- СЛАЙДЕР (ЛИСТАНИЕ БЕЗ ЗАДЕРЖКИ) ---
+      // --- СЛАЙДЕР (ЗАДЕРЖКА 50 МС) ---
 
       function changeImage(direction) {
+        if (isAnimating) return; // Защита от спама кликами
+        isAnimating = true;
+
         if (isZoomed) resetZoom();
 
         if (direction === 'next') {
@@ -388,23 +394,29 @@
         const outClass = direction === 'next' ? 'slide-out-left' : 'slide-out-right';
         const inClass = direction === 'next' ? 'slide-in-right' : 'slide-in-left';
 
-        // Мгновенно убираем старую картинку за экран
+        // 1. Начинаем анимацию уезда старой картинки
         imgWrapper.classList.add(outClass);
         
-        // Подгружаем новую
-        const img = galleryImages[currentIndex];
-        lightboxImg.src = img.dataset.full || img.src;
+        // 2. Ждем 50 мс, чтобы глаз зафиксировал начало движения
+        setTimeout(() => {
+          // 3. Подгружаем новую картинку
+          const img = galleryImages[currentIndex];
+          lightboxImg.src = img.dataset.full || img.src;
 
-        // Ставим новую за противоположный край
-        imgWrapper.classList.remove(outClass);
-        imgWrapper.classList.add(inClass);
+          // 4. Ставим её за противоположный край (мгновенно)
+          imgWrapper.classList.remove(outClass);
+          imgWrapper.classList.add(inClass);
 
-        // Даем браузеру отрисовать стартовую позицию и убираем класс, чтобы она плавно выехала
-        requestAnimationFrame(() => {
+          // 5. Даем браузеру отрисовать стартовую позицию и убираем класс, чтобы она плавно выехала
           requestAnimationFrame(() => {
-            imgWrapper.classList.remove(inClass);
+            requestAnimationFrame(() => {
+              imgWrapper.classList.remove(inClass);
+              
+              // Снимаем блокировку через 400 мс (время полной анимации приезда)
+              setTimeout(() => { isAnimating = false; }, 400);
+            });
           });
-        });
+        }, 50); // Задержка 50 мс
       }
 
       lightboxNext.addEventListener('click', (e) => { e.stopPropagation(); changeImage('next'); });
@@ -425,6 +437,7 @@
           lightboxImg.src = ''; 
           resetZoom();
           imgWrapper.className = 'img-wrapper';
+          isAnimating = false;
         }, 300);
       }
 
