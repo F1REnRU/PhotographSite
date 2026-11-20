@@ -269,7 +269,7 @@
       const galleryImages = Array.from(document.querySelectorAll('.gallery-item img'));
 
       let currentIndex = 0;
-      let isAnimating = false; // Блокировка от быстрых кликов
+      let isAnimating = false; // Блокировка от спама
       
       // Состояние зума и перетаскивания
       let isZoomed = false;
@@ -377,7 +377,7 @@
         }
       }
 
-      // --- СЛАЙДЕР (ЗАДЕРЖКА 50 МС) ---
+      // --- СЛАЙДЕР (ЗАДЕРЖКА 100 МС) ---
 
       function changeImage(direction) {
         if (isAnimating) return; // Защита от спама кликами
@@ -397,7 +397,7 @@
         // 1. Начинаем анимацию уезда старой картинки
         imgWrapper.classList.add(outClass);
         
-        // 2. Ждем 50 мс, чтобы глаз зафиксировал начало движения
+        // 2. Ждем 100 мс, чтобы старая картинка успела уехать
         setTimeout(() => {
           // 3. Подгружаем новую картинку
           const img = galleryImages[currentIndex];
@@ -416,7 +416,7 @@
               setTimeout(() => { isAnimating = false; }, 400);
             });
           });
-        }, 50); // Задержка 50 мс
+        }, 100); // Задержка 100 мс
       }
 
       lightboxNext.addEventListener('click', (e) => { e.stopPropagation(); changeImage('next'); });
